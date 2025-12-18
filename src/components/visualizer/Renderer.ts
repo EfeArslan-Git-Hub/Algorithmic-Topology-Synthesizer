@@ -80,11 +80,8 @@ export class Renderer {
         }
     }
 
-    public drawPath(path: Node[], cellSize: number, progress: number = 1.0) {
+    public drawPath(path: Node[], cellSize: number) {
         if (path.length === 0) return;
-
-        // Draw Start/End for context (Always visible if path exists?)
-        this.drawStartEnd(path[0], path[path.length - 1], cellSize);
 
         // Path
         this.ctx.strokeStyle = '#22c55e'; // Green path
@@ -101,9 +98,7 @@ export class Renderer {
         const startY = path[0].y * cellSize + cellSize / 2;
         this.ctx.moveTo(startX, startY);
 
-        const visibleCount = Math.floor(path.length * progress);
-
-        for (let i = 1; i < visibleCount; i++) {
+        for (let i = 1; i < path.length; i++) {
             const px = path[i].x * cellSize + cellSize / 2;
             const py = path[i].y * cellSize + cellSize / 2;
             this.ctx.lineTo(px, py);
@@ -113,7 +108,7 @@ export class Renderer {
         this.ctx.shadowBlur = 0;
     }
 
-    private drawStartEnd(start: Node, end: Node, cellSize: number) {
+    public drawMarkers(start: Node, end: Node, cellSize: number) {
         // Start: Hollow Cyan Circle
         const sx = start.x * cellSize + cellSize / 2;
         const sy = start.y * cellSize + cellSize / 2;

@@ -16,8 +16,11 @@ export const CanvasViewport = ({ data, width = 800, height = 600, path, visited 
     const rendererRef = useRef<Renderer | null>(null);
 
     // Animation States
+    // Animation States
     const [gridProgress, setGridProgress] = useState(0); // 0.0 to 1.0 for Grid
     const [pathProgress, setPathProgress] = useState(0); // 0.0 to 1.0 for Path
+    const [visitedProgress, setVisitedProgress] = useState(0); // 0 to N for Visited Nodes
+    const animationRef = useRef<number>(0);
 
     // Initialize Renderer
     useEffect(() => {
@@ -29,51 +32,49 @@ export const CanvasViewport = ({ data, width = 800, height = 600, path, visited 
         }
     }, [width, height]);
 
-    // Reset animation when data changes
+    // Reset Grid animation ONLY when data changes (New Map)
     useEffect(() => {
         setGridProgress(0);
-        setPathProgress(0);
     }, [data]);
 
-    // Reset path animation when path changes
+    // Reset Solver animation when path/visited changes (New Solution)
     useEffect(() => {
         setPathProgress(0);
-    }, [path]);
+        setVisitedProgress(0);
+    }, [path, visited]);
 
-    // Animation Loop
     useEffect(() => {
-        let animationFrameId: number;
+        const renderLoop = () => {
+            if (!rendererRef.current) {
+                animationRef.current = requestAnimationFrame(renderLoop);
+                return;
+            }
 
-        const animate = () => {
-            // 1. Animate Grid (Scanline)
+            // 1. Grid Animation (if applicable)
+            // For grid-based, gridProgress can represent the scanline or just a flag for completion
+            // If data.grid exists, we assume it's drawn instantly for now, or we can animate it.
+            // The original code had a scanline animation for gridProgress. Let's keep that logic.
             if (data.grid && gridProgress < 1.0) {
                 setGridProgress(prev => {
                     const next = prev + 0.02; // Speed of scan
-                    if (next >= 1.0) return 1.0;
-                    return next;
+                    return next >= 1.0 ? 1.0 : next;
                 });
             }
 
-            // 2. Animate Path (Snake)
-            // Only start if grid is done (or parallel? let's do parallel or independent)
-            if (path && path.length > 0 && pathProgress < 1.0) {
-                setPathProgress(prev => {
-                    const next = prev + 0.02; // Speed of path
-                    if (next >= 1.0) return 1.0;
-                    return next;
-                });
+            // 2. Visited Animation (Search) - Only starts after grid is done (or if no grid)
+            // We'll control speed here. visited.length can be huge (e.g. 5000), so we need a multiplier.
+            // Only animate visited if grid animation is complete (or not applicable)
+            if ((!data.grid || gridProgress >= 1.0) && visited && visited.length > 0 && visitedProgress < visited.length) {
+                // Speed: 5% of total nodes per frame or min 10 nodes, to keep it snappy but visible
+                const step = Math.max(5, Math.ceil(visited.length * 0.05));
+                setVisitedProgress(prev => Math.min(prev + step, visited.length));
             }
 
-            animationFrameId = requestAnimationFrame(animate);
-        };
+            // 3. Path Animation - Only starts after Visited is done
+            if ((!data.grid || gridProgress >= 1.0) && (!visited || visitedProgress >= (visited?.length || 0)) && path && path.length > 0 && pathProgress < path.length) {
+                setPathProgress(prev => Math.min(prev + 1, path.length));
+            }
 
-        animationFrameId = requestAnimationFrame(animate);
-        return () => cancelAnimationFrame(animationFrameId);
-    }, [data, gridProgress, path, pathProgress]);
-
-    // Draw Loop
-    useEffect(() => {
-        if (rendererRef.current) {
             const renderer = rendererRef.current;
             renderer.clear();
 
@@ -89,21 +90,36 @@ export const CanvasViewport = ({ data, width = 800, height = 600, path, visited 
 
                 // Draw Visited (Search Area)
                 if (visited && visited.length > 0) {
-                    renderer.drawVisited(visited, cellSize);
+                    // Start from index 0 up to visitedProgress
+                    const visibleVisited = visited.slice(0, visitedProgress);
+                    renderer.drawVisited(visibleVisited, cellSize);
                 }
 
-                // Draw Path
+                // Draw Markers & Path
                 if (path && path.length > 0) {
-                    renderer.drawPath(path, cellSize, pathProgress);
+                    // 1. Draw Fixed Markers (IN/OUT) using the FULL path
+                    // This ensures OUT is always at the destination, even if path is animating
+                    renderer.drawMarkers(path[0], path[path.length - 1], cellSize);
+
+                    // 2. Draw Animated Path (Snake)
+                    const visiblePath = path.slice(0, pathProgress);
+                    if (visiblePath.length > 0) {
+                        renderer.drawPath(visiblePath, cellSize);
+                    }
                 }
             }
             // Fallback for node-based (BSP legacy or Graph)
             else if (data.nodes.length > 0) {
-                // For now, no specific animation for legacy node mode in this view
-                // Just clear or draw static if needed
+                renderer.drawEdges(); // Fixed: No arguments expected
+                renderer.drawNodes(); // Fixed: No arguments expected
             }
-        }
-    }, [data, path, visited, width, height, gridProgress, pathProgress]);
+
+            animationRef.current = requestAnimationFrame(renderLoop);
+        };
+
+        animationRef.current = requestAnimationFrame(renderLoop);
+        return () => cancelAnimationFrame(animationRef.current);
+    }, [data, path, visited, width, height, gridProgress, pathProgress, visitedProgress]);
 
     return (
         <div className="relative border border-white/10 rounded-lg overflow-hidden shadow-2xl bg-[#0f0f0f]">
