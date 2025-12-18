@@ -1,6 +1,7 @@
 # Algorithmic Topology Synthesizer
 
-Online Version https://algorithmic-topology-synthesizer.vercel.app/
+
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_it_Online-2ea44f?style=for-the-badge&logo=vercel)](https://algorithmic-topology-synthesizer.vercel.app/)
 
 ![Hero Demo](screenshots/Binary%20Space%20Partitioning%20and%20A.PNG)
 
