@@ -24,7 +24,7 @@ This project bridges the gap between **Procedural Generation** (creating worlds)
 | **Binary Space Partitioning (BSP)** | **Cellular Automata (Cave Gen)** |
 |:---:|:---:|
 | Creates structured, room-based layouts connected by corridors. Standard for FPS levels. | Simulates organic growth using "Game of Life" rules. Creates natural, chaotic terrain. |
-| ![BSP](screenshots/Binary%20Space%20Partitioning%20and%20BFS%20(Flooding).PNG) | ![CA](screenshots/Cellular%20Automata%20and%20A.PNG) |
+| ![BSP](screenshots/Binary%20Space%20Partitioning%20and%20BFS%20(Flooding).PNG) | ![CA](screenshots/Binary%20Space%20Partitioning%20and%20A.PNG) |
 
 ### 2. The "Explorer" Algorithms (Pathfinding)
 
