@@ -17,21 +17,23 @@ This project bridges the gap between **Procedural Generation** (creating worlds)
 
 ---
 
-## � Visual Algorithm Comparison
+## 📸 Visual Algorithm Comparison
 
-### 1. The "Architect" Algorithms (Topology Generation)
+### 1. Scenario A: Structured Dungeons (Binary Space Partitioning)
+*Best for: FPS Levels, Office Layouts, RPG Dungeons.*
 
-| **Binary Space Partitioning (BSP)** | **Cellular Automata (Cave Gen)** |
+| **BFS Solver (The Flood)** | **A* Solver (The Sniper)** |
 |:---:|:---:|
-| Creates structured, room-based layouts connected by corridors. Standard for FPS levels. | Simulates organic growth using "Game of Life" rules. Creates natural, chaotic terrain. |
-| ![BSP](screenshots/Binary%20Space%20Partitioning%20and%20BFS%20(Flooding).PNG) | ![CA](screenshots/Binary%20Space%20Partitioning%20and%20A.PNG) |
+| **Inefficient search.** Floods the entire dungeon. | **Efficient search.** Goes straight for the target. |
+| ![BSP BFS](screenshots/Binary%20Space%20Partitioning%20and%20BFS%20(Flooding).PNG) | ![BSP A*](screenshots/Binary%20Space%20Partitioning%20and%20A.PNG) |
 
-### 2. The "Explorer" Algorithms (Pathfinding)
+### 2. Scenario B: Organic Caves (Cellular Automata)
+*Best for: Survival Games, Terrain, Biological Sims.*
 
-| **BFS (The Flood)** | **A* (The Sniper)** |
+| **BFS Solver (The Flood)** | **A* Solver (The Sniper)** |
 |:---:|:---:|
-| **Guaranteed but Slow.** Floods the entire map (massive yellow scan) to find the target. | **Precise and Fast.** Uses heuristics (Manhattan Distance) to ignore dead ends and go straight for the goal. |
-| ![BFS](screenshots/Cellular%20Automata%20and%20BFS.PNG) | ![AStar](screenshots/Cellular%20Automata%20and%20A.PNG) |
+| **Inefficient search.** Explores every nook and cranny. | **Efficient search.** Navigates mostly the main path. |
+| ![CA BFS](screenshots/Cellular%20Automata%20and%20BFS.PNG) | ![CA A*](screenshots/Cellular%20Automata%20and%20A.PNG) |
 
 ---
 
